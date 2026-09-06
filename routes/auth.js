@@ -59,10 +59,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const valid = await bcrypt.compare(password, user.passwordHash);
+        const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    user.lastLoginIp = req.ip;
+    await user.save();
 
     const token = signToken(user._id);
     res.json({ token, user: user.toPublicProfile() });
