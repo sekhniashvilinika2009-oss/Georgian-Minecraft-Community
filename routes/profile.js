@@ -30,6 +30,15 @@ router.put('/me/ign', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'No Minecraft account found with that IGN' });
     }
 
+    // Block linking an IGN that another account already has linked
+    const taken = await User.findOne({
+      ign: resolved.ign,
+      _id: { $ne: req.userId },
+    });
+    if (taken) {
+      return res.status(409).json({ error: 'That Minecraft account is already linked to another user' });
+    }
+
     const user = await User.findByIdAndUpdate(
       req.userId,
       { ign: resolved.ign, uuid: resolved.uuid, skinUrl: resolved.skinUrl },
@@ -37,6 +46,10 @@ router.put('/me/ign', requireAuth, async (req, res) => {
     );
     res.json(user.toPublicProfile());
   } catch (err) {
+    if (err.code === 11000) {
+      // Race condition: two people tried to link the same IGN at the same moment
+      return res.status(409).json({ error: 'That Minecraft account is already linked to another user' });
+    }
     console.error(err);
     res.status(502).json({ error: 'Could not reach Mojang API, try again shortly' });
   }
