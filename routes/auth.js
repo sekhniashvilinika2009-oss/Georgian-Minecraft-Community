@@ -25,9 +25,13 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'Username or email is already taken' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, passwordHash });
-
+       const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      username,
+      email,
+      passwordHash,
+      registrationIp: req.ip,
+    });
     // Logged to stdout, which Render captures in its Logs tab
     console.log(
       `[register] username="${username}" email="${email}" ip="${req.ip}" time="${new Date().toISOString()}"`
