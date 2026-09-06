@@ -5,9 +5,12 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, trim: true, lowercase: true },
   passwordHash: { type: String, required: true },
 
-  ign: { type: String, trim: true, default: null },
+   ign: { type: String, trim: true, default: null },
   uuid: { type: String, default: null },
   skinUrl: { type: String, default: null },
+
+  registrationIp: { type: String, default: null },
+  lastLoginIp: { type: String, default: null },
 
   servers: [{ type: String, trim: true }],
   achievements: [{ type: String, trim: true }],
