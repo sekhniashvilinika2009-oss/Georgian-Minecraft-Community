@@ -22,6 +22,14 @@ router.get('/:username', async (req, res) => {
 // Set/update Minecraft IGN -> auto-resolves UUID + skin via Mojang/Crafatar
 router.put('/me/ign', requireAuth, async (req, res) => {
   try {
+    const me = await User.findById(req.userId);
+    if (!me) return res.status(404).json({ error: 'User not found' });
+
+    // A user can only ever link one Minecraft account - no switching to a different one later
+    if (me.ign) {
+      return res.status(409).json({ error: 'You have already linked a Minecraft account and cannot link a different one' });
+    }
+
     const { ign } = req.body;
     if (!ign) return res.status(400).json({ error: 'IGN is required' });
 
@@ -30,14 +38,26 @@ router.put('/me/ign', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'No Minecraft account found with that IGN' });
     }
 
-    // Block linking an IGN that another account already has linked
-    const taken = await User.findOne({
-      ign: resolved.ign,
-      _id: { $ne: req.userId },
-    });
+    // Block linking a Minecraft account that another site user already has linked
+    const taken = await User.findOne({ ign: resolved.ign, _id: { $ne: req.userId } });
     if (taken) {
       return res.status(409).json({ error: 'That Minecraft account is already linked to another user' });
     }
+
+    me.ign = resolved.ign;
+    me.uuid = resolved.uuid;
+    me.skinUrl = resolved.skinUrl;
+    await me.save();
+
+    res.json(me.toPublicProfile());
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'That Minecraft account is already linked to another user' });
+    }
+    console.error(err);
+    res.status(502).json({ error: 'Could not reach Mojang API, try again shortly' });
+  }
+});
 
     const user = await User.findByIdAndUpdate(
       req.userId,
