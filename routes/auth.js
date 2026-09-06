@@ -20,9 +20,14 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    const existing = await User.findOne({ $or: [{ username }, { email: email.toLowerCase() }] });
+       const existing = await User.findOne({ $or: [{ username }, { email: email.toLowerCase() }] });
     if (existing) {
       return res.status(409).json({ error: 'Username or email is already taken' });
+    }
+
+    const sameIpAccount = await User.findOne({ registrationIp: req.ip });
+    if (sameIpAccount) {
+      return res.status(409).json({ error: 'Only one account is allowed per person' });
     }
 
        const passwordHash = await bcrypt.hash(password, 10);
