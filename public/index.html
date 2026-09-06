@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card block-panel">
+    <h1 class="pixel-title">PLAYER HUB</h1>
+    <p class="auth-sub">Your Minecraft profile, posts, friends &amp; chat.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Log in</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <label>Username or email
+        <input type="text" name="username" required autocomplete="username">
+      </label>
+      <label>Password
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      <p class="form-error" id="login-error"></p>
+      <button type="submit" class="btn btn-primary">Enter the hub</button>
+    </form>
+
+    <form id="register-form" class="auth-form hidden">
+      <label>Username
+        <input type="text" name="username" required minlength="3" maxlength="20">
+      </label>
+      <label>Email
+        <input type="email" name="email" required>
+      </label>
+      <label>Password
+        <input type="password" name="password" required minlength="6">
+      </label>
+      <p class="form-error" id="register-error"></p>
+      <button type="submit" class="btn btn-primary">Create account</button>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-block"></span>
+      <span class="pixel-title small">HUB</span>
+    </div>
+    <ul class="nav-list">
+      <li><a href="#dashboard" class="nav-link" data-view="dashboard"><i class="slot slot-dash"></i>Dashboard</a></li>
+      <li><a href="#profile" class="nav-link" data-view="profile"><i class="slot slot-profile"></i>Profile</a></li>
+      <li><a href="#posts" class="nav-link" data-view="posts"><i class="slot slot-post"></i>Posts</a></li>
+      <li><a href="#friends" class="nav-link" data-view="friends"><i class="slot slot-friends"></i>Friends</a></li>
+      <li><a href="#chat" class="nav-link" data-view="chat"><i class="slot slot-chat"></i>Chat</a></li>
+    </ul>
+    <button id="logout-btn" class="btn btn-ghost logout-btn">Log out</button>
+  </nav>
+
+  <main class="main-content">
+
+    <section id="view-dashboard" class="view">
+      <h2 class="section-title">Dashboard</h2>
+      <div class="dash-grid">
+        <div class="block-panel dash-card" id="dash-identity">
+          <div class="skin-frame"><img id="dash-skin" src="" alt="" class="hidden"></div>
+          <div>
+            <p class="dash-ign" id="dash-ign">No IGN linked yet</p>
+            <p class="dash-sub" id="dash-username"></p>
+          </div>
+        </div>
+        <div class="block-panel dash-card stat-mini">
+          <span class="stat-num" id="dash-friends">0</span>
+          <span class="stat-label">Friends</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-profile" class="view hidden">
+      <h2 class="section-title">Profile</h2>
+      <div class="block-panel form-panel">
+        <label>Minecraft IGN
+          <div class="ign-row">
+            <input type="text" id="ign-input" placeholder="e.g. Notch">
+            <button id="ign-save" class="btn btn-primary">Link account</button>
+          </div>
+        </label>
+        <p class="form-hint" id="ign-hint"></p>
+        <div id="profile-identity" class="profile-identity hidden">
+          <img id="profile-skin" src="" alt="">
+          <div>
+            <p><strong id="profile-ign"></strong></p>
+            <p class="dash-sub" id="profile-uuid"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block-panel form-panel">
+        <label>Servers you play on (comma-separated)
+          <input type="text" id="servers-input" placeholder="hypixel.net, mc.example.com">
+        </label>
+        <button id="servers-save" class="btn btn-secondary">Save servers</button>
+      </div>
+
+      <div class="block-panel form-panel">
+        <label>Achievements (comma-separated)
+          <input type="text" id="achievements-input" placeholder="Ranked S1 Champion, Dragon Slayer">
+        </label>
+        <button id="achievements-save" class="btn btn-secondary">Save achievements</button>
+      </div>
+
+      <div class="block-panel form-panel">
+        <label>View another player's profile
+          <div class="ign-row">
+            <input type="text" id="lookup-input" placeholder="username">
+            <button id="lookup-btn" class="btn btn-secondary">View profile</button>
+          </div>
+        </label>
+        <p class="form-hint" id="lookup-hint"></p>
+        <div id="lookup-result" class="profile-identity hidden">
+          <img id="lookup-skin" src="" alt="">
+          <div>
+            <p><strong id="lookup-username"></strong></p>
+            <p class="dash-sub" id="lookup-ign"></p>
+            <p class="dash-sub" id="lookup-servers"></p>
+            <p class="dash-sub" id="lookup-achievements"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-posts" class="view hidden">
+      <h2 class="section-title">Posts</h2>
+      <div class="block-panel form-panel">
+        <textarea id="post-input" placeholder="Share something with the hub..." maxlength="2000"></textarea>
+        <button id="post-submit" class="btn btn-primary">Post</button>
+      </div>
+      <div id="posts-list"></div>
+    </section>
+
+    <section id="view-friends" class="view hidden">
+      <h2 class="section-title">Friends</h2>
+      <div class="block-panel form-panel">
+        <label>Add a friend by username
+          <div class="ign-row">
+            <input type="text" id="friend-input" placeholder="username">
+            <button id="friend-add" class="btn btn-primary">Send request</button>
+          </div>
+        </label>
+        <p class="form-hint" id="friend-hint"></p>
+      </div>
+
+      <div class="friends-grid">
+        <div class="block-panel">
+          <h3 class="subsection-title">Incoming requests</h3>
+          <ul id="friend-incoming" class="friend-list"></ul>
+        </div>
+        <div class="block-panel">
+          <h3 class="subsection-title">Your friends</h3>
+          <ul id="friend-list" class="friend-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-chat" class="view hidden">
+      <h2 class="section-title">Chat</h2>
+      <div class="chat-layout">
+        <div class="block-panel chat-conv-list">
+          <h3 class="subsection-title">Friends</h3>
+          <ul id="chat-conversations" class="friend-list"></ul>
+        </div>
+        <div class="block-panel chat-window">
+          <div id="chat-empty" class="dash-sub">Pick a friend to start chatting.</div>
+          <div id="chat-active" class="hidden">
+            <h3 class="subsection-title" id="chat-with"></h3>
+            <div id="chat-messages" class="chat-messages"></div>
+            <form id="chat-form" class="chat-form">
+              <input type="text" id="chat-input" placeholder="Type a message..." maxlength="1000" autocomplete="off" required>
+              <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
