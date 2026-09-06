@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, trim: true, lowercase: true },
   passwordHash: { type: String, required: true },
 
-   ign: { type: String, trim: true, default: null },
+  ign: { type: String, trim: true, default: null, unique: true, sparse: true },
   uuid: { type: String, default: null },
   skinUrl: { type: String, default: null },
 
